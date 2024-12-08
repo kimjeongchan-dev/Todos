@@ -13,3 +13,19 @@ class TodoSchema(BaseModel):
 
 class GetTodosResponse(BaseModel):
     todos: list[TodoSchema]
+
+
+class SignUpResponse(BaseModel):
+    id: int
+    name: str
+
+    @classmethod
+    def from_orm(cls, obj):
+        return cls(
+            id=obj.id,
+            name=obj.name
+        )
+
+
+class JWTResponse(BaseModel):
+    access_token: str
