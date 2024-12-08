@@ -2,18 +2,32 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from database.connection import get_db
-from database.orm import Todo
-from database.repository import TodoRepository
+from database.orm import Todo, User
+from database.repository import TodoRepository, UserRepository
 from schema.request import CreateTodoRequest, UpdateTodoRequest
 from schema.response import GetTodosResponse, TodoSchema
+from security import get_access_token
+from service.user import UserService
 
 
 router = APIRouter(prefix="/todos", tags=["todos"])
 
 
 @router.get("/", status_code=200)
-def get_todos_handler(order: str | None = None, todo_repository: TodoRepository = Depends(TodoRepository)) -> GetTodosResponse:
-    todos: list[Todo] = todo_repository.get_todos()
+def get_todos_handler(
+    order: str | None = None, 
+    user_repository: UserRepository = Depends(UserRepository),
+    user_service: UserService = Depends(UserService),
+    access_token: str = Depends(get_access_token)
+) -> GetTodosResponse:
+    
+    user_id: int = user_service.decode_token(token=access_token)
+    user: User | None = user_repository.get_user_by_user_id(user_id=user_id)
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    todos: list[Todo] = user.todos
     if order == "DESC":
         return GetTodosResponse(todos=[TodoSchema.from_orm(todo) for todo in todos[::-1]])
 

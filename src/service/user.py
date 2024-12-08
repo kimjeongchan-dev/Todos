@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 import os
+import time
 import bcrypt
+import random
 from jose import jwt
 
 
@@ -17,9 +19,22 @@ class UserService:
     def create_token(self, user_id: int) -> str:
         return jwt.encode(
             {
-                "sub": user_id, 
+                "sub": str(user_id), 
                 "exp": datetime.now() + timedelta(days=1)
             }, 
             key=os.getenv("JWT_SECRET_KEY"), 
             algorithm=os.getenv("JWT_ALGORITHM")
         )
+    
+    def decode_token(self, token: str) -> int:
+        payload: dict = jwt.decode(token, key=os.getenv("JWT_SECRET_KEY"), algorithms=[os.getenv("JWT_ALGORITHM")])
+        return int(payload["sub"])
+    
+    @staticmethod
+    def create_opt() -> int:
+        return random.randint(1000, 9999)
+
+    @staticmethod
+    def send_email_to_user(email: str) -> None:
+        time.sleep(10)
+        print(f"Sending email to {email}")

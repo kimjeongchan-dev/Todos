@@ -17,3 +17,12 @@ class SignUpRequest(BaseModel):
 class LoginRequest(BaseModel):
     name: str
     password: str
+
+
+class CreateOptRequest(BaseModel):
+    email: str
+
+
+class VerifyOptRequest(BaseModel):
+    email: str
+    opt: int

@@ -10,9 +10,12 @@ class TodoRepository:
     def __init__(self, db: Session = Depends(get_db)):
         self.db = db
 
+
+    def get_todos(self) -> list[Todo]:
+        return list(self.db.scalars(select(Todo)).all())
+
     def get_todo_by_todo_id(self, todo_id: int) -> Todo | None:
         return self.db.scalar(select(Todo).where(Todo.id == todo_id))
-
 
     def create_todo(self, request: CreateTodoRequest) -> Todo:
         todo = Todo(contents=request.contents, is_done=request.is_done)
@@ -44,3 +47,6 @@ class UserRepository:
 
     def get_user_by_name(self, name: str) -> User | None:
         return self.db.scalar(select(User).where(User.name == name))
+
+    def get_user_by_user_id(self, user_id: int) -> User | None:
+        return self.db.scalar(select(User).where(User.id == user_id))

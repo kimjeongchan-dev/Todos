@@ -29,3 +29,13 @@ class SignUpResponse(BaseModel):
 
 class JWTResponse(BaseModel):
     access_token: str
+
+
+
+class UserResponse(BaseModel):
+    id: int
+    name: str
+
+    @classmethod
+    def from_orm(cls, obj):
+        return cls(id=obj.id, name=obj.name)
